@@ -8,11 +8,11 @@ model = pickle.load(open("model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 columns = pickle.load(open("columns.pkl", "rb"))
 
-# Page Config
+# Page config
 st.set_page_config(
     page_title="CredWise",
     page_icon="💳",
-    layout="wide"
+    layout="centered"
 )
 
 # Title
@@ -21,39 +21,33 @@ st.caption("AI-powered Loan Risk & Approval Prediction System")
 
 st.divider()
 
-# Sidebar Inputs
-st.sidebar.header("Applicant Details")
+# Input Section
+st.subheader("Enter Applicant Details")
 
-income = st.sidebar.number_input("Applicant Income", value=10000.0)
-loan_amount = st.sidebar.number_input("Loan Amount", value=100000.0)
-credit_score = st.sidebar.number_input("Credit Score", value=650.0)
-loan_term = st.sidebar.number_input("Loan Term (Months)", value=12)
-dti = st.sidebar.number_input("DTI Ratio", value=0.5)
+col1, col2 = st.columns(2)
 
-employer = st.sidebar.selectbox(
-    "Employer Category",
-    ["MNC", "Other"]
-)
+with col1:
+    income = st.number_input("Applicant Income", value=10000.0)
+    loan_amount = st.number_input("Loan Amount", value=100000.0)
+    credit_score = st.number_input("Credit Score", value=650.0)
 
-marital = st.sidebar.selectbox(
+with col2:
+    loan_term = st.number_input("Loan Term (Months)", value=12)
+    dti = st.number_input("DTI Ratio", value=0.5)
+
+    employer = st.selectbox(
+        "Employer Category",
+        ["MNC", "Other"]
+    )
+
+marital = st.selectbox(
     "Marital Status",
     ["Single", "Married"]
 )
 
-st.sidebar.divider()
+st.divider()
 
-predict = st.sidebar.button("Predict Risk")
-
-# Layout
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("Applicant Summary")
-    st.write(f"**Income:** ₹{income}")
-    st.write(f"**Loan Amount:** ₹{loan_amount}")
-    st.write(f"**Credit Score:** {credit_score}")
-    st.write(f"**Loan Term:** {loan_term} months")
-    st.write(f"**DTI Ratio:** {dti}")
+predict = st.button("Predict Loan Risk")
 
 # Prediction
 if predict:
@@ -83,31 +77,31 @@ if predict:
     risk = 1 - probability
     risk_percent = risk * 100
 
-    with col2:
-        st.subheader("Prediction Result")
+    st.divider()
 
-        if prediction[0] == 1:
-            st.success("✅ Loan Approved")
-        else:
-            st.error("❌ Loan Rejected")
+    # Result
+    if prediction[0] == 1:
+        st.success("✅ Loan Approved")
+    else:
+        st.error("❌ Loan Rejected")
 
-        # Risk Score
-        st.subheader("Risk Score")
+    # Risk Score
+    st.subheader("Risk Score")
 
-        st.progress(float(risk))
-        st.write(f"Risk Score: {risk_percent:.0f}%")
+    st.progress(float(risk))
+    st.write(f"Risk Score: {risk_percent:.0f}%")
 
-        # Credit Grade
-        if risk < 0.2:
-            grade = "A"
-        elif risk < 0.4:
-            grade = "B"
-        elif risk < 0.7:
-            grade = "C"
-        else:
-            grade = "D"
+    # Credit Grade
+    if risk < 0.2:
+        grade = "A"
+    elif risk < 0.4:
+        grade = "B"
+    elif risk < 0.7:
+        grade = "C"
+    else:
+        grade = "D"
 
-        st.metric("Credit Grade", grade)
+    st.metric("Credit Grade", grade)
 
     # Risk Factors
     st.divider()
